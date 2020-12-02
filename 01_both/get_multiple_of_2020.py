@@ -9,13 +9,12 @@ get_multiple_of_2020.py is a script for advent of code 01/01
 """
 import os
 import copy
+from common import load_input_file
 FIXED_MULTIPLE = 2020
 
 if __name__ == "__main__":
     print("Welcome to get_multiple_of_2020.py")
-    code_input = os.path.join(os.getcwd(), 'input.txt')
-    with open(code_input, 'r') as f:
-        input_list = [int(element) for element in f.readlines()]
+    input_list = load_input_file(os.getcwd())
     print(len(input_list))
     remainder_list = copy.copy(input_list)
     for number in input_list:
