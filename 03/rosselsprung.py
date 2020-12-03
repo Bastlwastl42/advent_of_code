@@ -16,7 +16,6 @@ FREE_SIGN = '.'
 
 MOVING_PATERNS = [(1, 3), (1, 1), (1, 5), (1, 7), (2, 1)]
 
-
 def follow_patterns(input_lines, down_inc, right_inc):
     tree_counter = 0
     max_width = len(input_lines[0])
@@ -24,8 +23,8 @@ def follow_patterns(input_lines, down_inc, right_inc):
     for (depth_counter, line_counter) in zip(
             range(1 * down_inc - 1 * down_inc, len(input_lines), down_inc),
             range(len(input_lines))):
-        # print(f'{depth_counter}, {(line_counter * right_inc)}')
-        if input_lines[depth_counter][((depth_counter * right_inc) % max_width)] == TREE_SIGN:
+        #print(f'{depth_counter}, {(line_counter * right_inc)}')
+        if input_lines[depth_counter][((line_counter * right_inc) % max_width)] == TREE_SIGN:
             # print(f'Hit tree at {depth_counter}')
             tree_counter += 1
     print(f'{tree_counter}')
