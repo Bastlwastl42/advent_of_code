@@ -3,7 +3,7 @@
 """
 Created on 03/12/2020 08:51
 
-@author: Sebastian Lehrack
+@author: Sebastian
 
 rosselsprung.py is a script for advent of code part 3
 """

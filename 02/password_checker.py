@@ -3,7 +3,7 @@
 """
 Created on 02/12/2020 08:23
 
-@author: Sebastian Lehrack
+@author: Sebastian
 
 password_checker.py is a script for advent of code part 02
 """

@@ -3,7 +3,7 @@
 """
 Created on 01/12/2020 08:56
 
-@author: Sebastian Lehrack
+@author: Sebastian
 
 get_multiple_of_2020.py is a script for advent of code 01/01
 """
