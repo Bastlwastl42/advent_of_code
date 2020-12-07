@@ -9,8 +9,9 @@ check_my_bag.py is a script for advent of code 7
 """
 
 import os
-from common import load_input_file
 from typing import List, Union
+
+from common import load_input_file
 
 
 class Bag:
@@ -36,7 +37,15 @@ class Bag:
         return self.check_bag(Bag.direct_init(1, 'gold', 'shiny'))
 
     def check_bag(self, other_Bag):
-        return self.amount >= other_Bag.amount and self.color == other_Bag.color and self.form == other_Bag.form
+        return self.amount >= other_Bag.amount \
+               and self.color == other_Bag.color \
+               and self.form == other_Bag.form
+
+    def __eq__(self, other):
+        return self.form == other.form and self.color == other.color
+
+    def __hash__(self):
+        return id(self)
 
 
 def search_by_initial_rule_list_upwards(rule_list: List[Bag]):
@@ -70,8 +79,7 @@ class BagTree:
                 # this should be the end of the recursion
                 self.childs_tree.append(BagTree(parent=self.own, childs=[], own=bag))
                 continue
-            [childs_childs] = [val_list for key, val_list in all_bag_rule.items() if
-                               key.color == bag.color and key.form == bag.form]
+            [childs_childs] = [val_list for key, val_list in all_bag_rule.items() if key == bag]
             self.childs_tree.append(BagTree(parent=self.own, childs=childs_childs, own=bag))
 
     def recursive_tree_fillin(self, all_bag_rule):
@@ -98,7 +106,7 @@ class BagTree:
 if __name__ == "__main__":
     print("Welcome to check_my_bag.py")
     input_lines = load_input_file(os.getcwd())
-
+    shiny_golden_bag = Bag.direct_init(1, 'gold', 'shiny')
     found_golden_bags = 0
     surround_bags_found = set()
     bag_rule = {}
@@ -110,12 +118,11 @@ if __name__ == "__main__":
         bag_rule[surround_bag] = bag_rule_list
 
     # tree search up
-    rules_to_check = [Bag.direct_init(1, 'gold', 'shiny')]
+    rules_to_check = [shiny_golden_bag]
     waves_of_bags = search_by_initial_rule_list_upwards(rules_to_check)
     print(len(waves_of_bags))
     # tree search down
-    [rules_to_check] = [val for key, val in bag_rule.items() if
-                        key.color == 'gold' and key.form == 'shiny']
-    root_tree = BagTree(None, rules_to_check, Bag.direct_init(1, 'gold', 'shiny'))
+    [rules_to_check] = [val for key, val in bag_rule.items() if key == shiny_golden_bag]
+    root_tree = BagTree(None, rules_to_check, shiny_golden_bag)
     root_tree.recursive_tree_fillin(all_bag_rule=bag_rule)
     print(root_tree.recursive_top_down_traversal())
