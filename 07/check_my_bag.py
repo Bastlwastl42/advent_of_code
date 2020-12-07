@@ -102,6 +102,22 @@ class BagTree:
             return self.own.amount + self.own.amount * sum(
                 [child_tree.bag_contained() for child_tree in self.childs_tree])
 
+    def find_all_in_tree(self, searched_bag: Bag):
+        """
+        from top to bottom, find all instances of given bag in the tree.
+        TODO: This should return the found node were own == searched_bag
+        TODO: Find a way to identify nodes in try by given bag. __eq__ self.own?
+        :return: List of found bags
+        """
+        if self.childs[0].amount == 0:
+            return self.childs_tree
+        else:
+            list_from_below = [ch_tree.find_all_in_tree(searched_bag) for ch_tree in
+                               self.childs_tree]
+            list_from_below.append(self.childs_tree)
+
+            return [bag_tree for bag_tree_list in list_from_below for bag_tree in bag_tree_list if bag_tree.own == searched_bag]
+
 
 if __name__ == "__main__":
     print("Welcome to check_my_bag.py")
@@ -126,3 +142,4 @@ if __name__ == "__main__":
     root_tree = BagTree(None, rules_to_check, shiny_golden_bag)
     root_tree.recursive_tree_fillin(all_bag_rule=bag_rule)
     print(root_tree.recursive_top_down_traversal())
+    print(root_tree.find_all_in_tree(shiny_golden_bag))
