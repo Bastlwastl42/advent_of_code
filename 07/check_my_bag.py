@@ -95,32 +95,6 @@ class BagTree:
                 [child_tree.bag_contained() for child_tree in self.childs_tree])
 
 
-def lineararize_bag_list(list_of_bags: List[Bag]):
-    result_list = []
-    for bag_rule in list_of_bags:
-        for counter in range(bag_rule.amount):
-            result_list.append(Bag.direct_init(1, bag_rule.color, bag_rule.form))
-    return result_list
-
-
-def search_by_initial_rule_list_downwards(rule_list: List[Bag], all_bag_rule):
-    no_new_set_found = False
-    waves_of_bags = list()
-    while not no_new_set_found:
-        pre_size = len(waves_of_bags)
-        act_found_rules = list()
-        for rule in lineararize_bag_list(rule_list):
-            for key_bag, bag_list in all_bag_rule.items():
-                if key_bag.color == rule.color and key_bag.form == rule.form:
-                    act_found_rules.extend(bag_list)
-        waves_of_bags.extend(act_found_rules)
-        if pre_size == len(waves_of_bags):
-            no_new_set_found = True
-        else:
-            rule_list = list(act_found_rules)
-    return sum([bag.amount for bag in waves_of_bags])
-
-
 if __name__ == "__main__":
     print("Welcome to check_my_bag.py")
     input_lines = load_input_file(os.getcwd())
@@ -145,4 +119,3 @@ if __name__ == "__main__":
     root_tree = BagTree(None, rules_to_check, Bag.direct_init(1, 'gold', 'shiny'))
     root_tree.recursive_tree_fillin(all_bag_rule=bag_rule)
     print(root_tree.recursive_top_down_traversal())
-    # print(search_by_initial_rule_list_downwards(rules_to_check, bag_rule))
