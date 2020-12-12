@@ -9,58 +9,52 @@ ising_model_seats.py is a script for advent of code 11
 """
 
 import os
+from copy import deepcopy
 
 from common import load_input_file
-from copy import deepcopy
 
 EMPTY_SEAT = bytearray('L', 'utf-8')[0]
 FLOOR = bytearray('.', 'utf-8')[0]
 OCCUPIED_SEAT = bytearray('#', 'utf-8')[0]
+PART_TWO_FLAG = False
+if PART_TWO_FLAG:
+    OCCUPIED_TOLERANCE = 5
+else:
+    OCCUPIED_TOLERANCE = 4
+
+DIRECTIONS = [(-1, -1), (-1, 0), (-1, +1), (0, -1), (0, 0), (0, +1), (1, -1), (1, 0), (1, 1)]
 
 
-def get_full_square(input_lines, x, y):
-    max_depth = len(input_lines)
-    max_line = len(input_lines[0])
-    # cover edge cases
-    if x == 0 and y == 0:
-        return [FLOOR, FLOOR, FLOOR,
-                FLOOR, input_lines[x][y], input_lines[x + 1][y],
-                FLOOR, input_lines[x][y + 1], input_lines[x + 1][y + 1]]
-    if x == max_depth - 1 and y == max_line - 1:
-        return [input_lines[x - 1][y - 1], input_lines[x][y - 1], FLOOR,
-                input_lines[x - 1][y], input_lines[x][y], FLOOR,
-                FLOOR, FLOOR, FLOOR]
-    if x == 0 and y == max_line - 1:
-        return [FLOOR, input_lines[x][y - 1], input_lines[x + 1][y - 1],
-                FLOOR, input_lines[x][y], input_lines[x + 1][y],
-                FLOOR, FLOOR, FLOOR]
-    if x == max_depth - 1 and y == 0:
-        return [FLOOR, FLOOR, FLOOR,
-                input_lines[x - 1][y], input_lines[x][y], FLOOR,
-                input_lines[x - 1][y + 1], input_lines[x][y + 1], FLOOR]
-    if x == 0 and y not in [0, max_line]:
-        try:
-            return [FLOOR, input_lines[x][y - 1], input_lines[x + 1][y - 1],
-                    FLOOR, input_lines[x][y], input_lines[x + 1][y],
-                    FLOOR, input_lines[x][y + 1], input_lines[x + 1][y + 1]]
-        except IndexError:
-            print('what')
-    if x == max_depth - 1 and y not in [0, max_line - 1]:
-        return [input_lines[x - 1][y - 1], input_lines[x][y - 1], FLOOR,
-                input_lines[x - 1][y], input_lines[x][y], FLOOR,
-                input_lines[x - 1][y + 1], input_lines[x][y + 1], FLOOR]
-    if y == 0 and x not in [0, max_depth - 1]:
-        return [FLOOR, FLOOR, FLOOR,
-                input_lines[x - 1][y], input_lines[x][y], input_lines[x + 1][y],
-                input_lines[x - 1][y + 1], input_lines[x][y + 1], input_lines[x + 1][y + 1]]
-    if y == max_line - 1 and x not in [0, max_depth - 1]:
-        return [input_lines[x - 1][y - 1], input_lines[x][y - 1], input_lines[x + 1][y - 1],
-                input_lines[x - 1][y], input_lines[x][y], input_lines[x + 1][y],
-                FLOOR, FLOOR, FLOOR]
+def get_surrounds(input_lines, x, y):
+    return_square = []
+    for dir_x, dir_y in DIRECTIONS:
+        if dir_x < 0:
+            x_range = range(x + dir_x, 0 + dir_x, dir_x)
+        if dir_x > 0:
+            x_range = range(x + dir_x, max_depth, dir_x)
+        if dir_y < 0:
+            y_range = range(y + dir_y, 0 + dir_y, dir_y)
+        if dir_y > 0:
+            y_range = range(y + dir_y, max_line, dir_y)
+        if dir_y == 0 and dir_x == 0:
+            return_square.append(input_lines[x][y])
+            continue
+        if dir_x == 0:
+            x_range = [x for _ in range(len(y_range))]
+        if dir_y == 0:
+            y_range = [y for _ in range(len(x_range))]
 
-    return [input_lines[x - 1][y - 1], input_lines[x][y - 1], input_lines[x + 1][y - 1],
-            input_lines[x - 1][y], input_lines[x][y], input_lines[x + 1][y],
-            input_lines[x - 1][y + 1], input_lines[x][y + 1], input_lines[x + 1][y + 1]]
+        found_seat = False
+        for get_x, get_y in zip(x_range, y_range):
+            if input_lines[get_x][get_y] == FLOOR and PART_TWO_FLAG:
+                continue
+            return_square.append(input_lines[get_x][get_y])
+            found_seat = True
+            break
+
+        if not found_seat:
+            return_square.append(FLOOR)
+    return return_square
 
 
 def get_all_occ_seats(input_lines):
@@ -86,7 +80,8 @@ def convert_to_occupied(square_val):
 
 def convert_to_empty(square_val):
     surround = surrounding(square_val)
-    if square_val[4] == OCCUPIED_SEAT and sum([1 for i in surround if i == OCCUPIED_SEAT]) >= 4:
+    if square_val[4] == OCCUPIED_SEAT and sum(
+            [1 for i in surround if i == OCCUPIED_SEAT]) >= OCCUPIED_TOLERANCE:
         return EMPTY_SEAT
     return square_val[4]
 
@@ -104,11 +99,11 @@ if __name__ == "__main__":
         previous_occupied = get_all_occ_seats(input_vals)
         for x in range(max_depth):
             for y in range(max_line):
-                new_vals[x][y] = convert_to_occupied(get_full_square(input_vals, x, y))
+                new_vals[x][y] = convert_to_occupied(get_surrounds(input_vals, x, y))
 
         for x in range(max_depth):
             for y in range(max_line):
-                input_vals[x][y] = convert_to_empty(get_full_square(new_vals, x, y))
+                input_vals[x][y] = convert_to_empty(get_surrounds(new_vals, x, y))
         iter_counter += 1
         current_occupation = get_all_occ_seats(input_vals)
         same_occupation = not (current_occupation == previous_occupied)
