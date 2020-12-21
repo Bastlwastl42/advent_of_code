@@ -76,7 +76,6 @@ class SateliteSimulation:
                 itertools.product(*product_lists)
                 if e != field_tuple}
 
-
     def boot_up_(self):
         boot_up_cycles = 6
         for counter in range(boot_up_cycles):
