@@ -18,33 +18,33 @@ def shufle_cups(starting_numbers: List[int], number_of_turns: int = 100):
     current_cup = starting_numbers[0]
     current_numbers = collections.deque(starting_numbers)
     for counter in range(number_of_turns):
-        if counter % 100000 == 0:
+        if counter % 100 == 0:
             print(counter)
         # pick the next three cups to the current cup
-        next_three, remainder = pick_next_three(current_numbers, current_cup)
+        next_three, current_numbers = pick_next_three(current_numbers, current_cup)
         # pick destination cup from remainder
-        destination_cup = pick_destination_cup(remainder, current_cup)
-        current_numbers = remainder[0:destination_cup + 1]
+        destination_cup_pos = pick_destination_cup(current_numbers, current_cup)
+        current_numbers.rotate((destination_cup_pos+1)*-1)
         current_numbers.extend(next_three)
-        current_numbers.extend(remainder[destination_cup + 1:])
         # keep turning until current cup is on front
-        current_numbers = collections.deque(current_numbers)
-        while current_numbers[-1] != current_cup:
-            current_numbers.rotate(-1)
-        current_cup = current_numbers[0]
+        current_cup_pos = current_numbers.index(current_cup)
+        current_cup = current_numbers[current_cup_pos+1]
 
     # return the list starting with one after the 1
-    while current_numbers[-1] != 1:
-        current_numbers.rotate(-1)
+    number_one_pos = current_numbers.index(1)
+    current_numbers.rotate((number_one_pos+1)*-1)
     return list(current_numbers)[:-1]
 
 
 def pick_next_three(list_of_numbers, current_cup):
     # resort so current cup is in front
     act_list = list_of_numbers
-    while act_list[-1] != current_cup:
-        act_list.rotate(-1)
-    return list(act_list)[0:3], list(act_list)[3:]
+    current_cup_pos = list_of_numbers.index(current_cup)
+    act_list.rotate((current_cup_pos+1)*-1)
+    one = act_list.popleft()
+    two = act_list.popleft()
+    three = act_list.popleft()
+    return [one, two, three], act_list
 
 
 def pick_destination_cup(remainder, current_cup_label):
@@ -64,7 +64,7 @@ def get_starting_positions(input_line: str):
 
 def get_million_starting_positions(input_line: str):
     starting_numbers = [int(i) for i in input_line]
-    starting_numbers.extend(range(max(starting_numbers) + 1, 1000000))
+    starting_numbers.extend(range(max(starting_numbers) + 1, 1000001))
     return starting_numbers
 
 
